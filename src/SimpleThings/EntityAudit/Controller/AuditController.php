@@ -76,8 +76,7 @@ class AuditController extends Controller
      */
     public function viewEntityAction($className, $id)
     {
-        $ids = explode(',', $id);
-        $revisions = $this->getAuditReader()->findRevisions($className, $ids);
+        $revisions = $this->getAuditReader()->findRevisions($className, $id);
 
         return $this->render('@SimpleThingsEntityAudit/Audit/view_entity.html.twig', [
             'id' => $id,
@@ -96,8 +95,7 @@ class AuditController extends Controller
      */
     public function viewDetailAction($className, $id, $rev)
     {
-        $ids = explode(',', $id);
-        $entity = $this->getAuditReader()->find($className, $ids, $rev);
+        $entity = $this->getAuditReader()->find($className, $id, $rev);
 
         $data = $this->getAuditReader()->getEntityValues($className, $entity);
         krsort($data);
@@ -131,8 +129,7 @@ class AuditController extends Controller
             $newRev = $request->query->get('newRev');
         }
 
-        $ids = explode(',', $id);
-        $diff = $this->getAuditReader()->diff($className, $ids, $oldRev, $newRev);
+        $diff = $this->getAuditReader()->diff($className, $id, $oldRev, $newRev);
 
         return $this->render('@SimpleThingsEntityAudit/Audit/compare.html.twig', [
             'className' => $className,

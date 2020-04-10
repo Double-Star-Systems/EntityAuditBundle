@@ -8,6 +8,7 @@ class AuditConfiguration
 {
     private $auditedEntityClasses = [];
     private $globalIgnoreColumns = [];
+    private $tableIgnoreColumns = [];
     private $tablePrefix = '';
     private $tableSuffix = '_audit';
     private $revisionTableName = 'revisions';
@@ -111,6 +112,21 @@ class AuditConfiguration
         $this->globalIgnoreColumns = $columns;
     }
 
+    public function getTableIgnoreColumns()
+    {
+        return $this->tableIgnoreColumns;
+    }
+
+    public function setTableIgnoreColumn(array $fields)
+    {
+        $this->tableIgnoreColumns = $fields;
+    }
+
+    public function isIgnoredField(string $field)
+    {
+        return in_array($field, $this->getTableIgnoreColumns());
+    }
+
     public function createMetadataFactory()
     {
         return new Metadata\MetadataFactory($this->auditedEntityClasses);
@@ -166,5 +182,15 @@ class AuditConfiguration
     public function getRevisionIdFieldType()
     {
         return $this->revisionIdFieldType;
+    }
+
+    public function setConvertEnumToString($convertEnum)
+    {
+        $this->convertEnumToString = $convertEnum;
+    }
+
+    public function convertEnumToString()
+    {
+        return $this->convertEnumToString;
     }
 }

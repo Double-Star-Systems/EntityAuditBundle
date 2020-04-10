@@ -7,4 +7,5 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity
  */
-class BookCategory extends Category {}
+class BookCategory extends Category
+{}

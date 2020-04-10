@@ -71,7 +71,7 @@ class LogRevisionsListener implements EventSubscriber
     /**
      * @var array
      */
-    private $insertRevisionSQL = array();
+    private $insertRevisionSQL = [];
 
     /**
      * @var \Doctrine\ORM\UnitOfWork
@@ -86,7 +86,7 @@ class LogRevisionsListener implements EventSubscriber
     /**
      * @var array
      */
-    private $extraUpdates = array();
+    private $extraUpdates = [];
 
     public function __construct(AuditManager $auditManager)
     {
@@ -96,7 +96,7 @@ class LogRevisionsListener implements EventSubscriber
 
     public function getSubscribedEvents()
     {
-        return array(Events::onFlush, Events::postPersist, Events::postUpdate, Events::postFlush, Events::onClear);
+        return [Events::onFlush, Events::postPersist, Events::postUpdate, Events::postFlush, Events::onClear];
     }
 
     /**
@@ -142,9 +142,9 @@ class LogRevisionsListener implements EventSubscriber
                     'SET ' . $field . ' = ' . $placeholder . ' ' .
                     'WHERE ' . $this->config->getRevisionFieldName() . ' = ? ';
 
-                $params = array($value, $this->getRevisionId());
+                $params = [$value, $this->getRevisionId()];
 
-                $types = array();
+                $types = [];
 
                 if (in_array($column, $meta->columnNames)) {
                     $types[] = $meta->getTypeOfField($fieldName);
@@ -243,7 +243,7 @@ class LogRevisionsListener implements EventSubscriber
 
     public function onClear()
     {
-        $this->extraUpdates = array();
+        $this->extraUpdates = [];
     }
 
     public function onFlush(OnFlushEventArgs $eventArgs)
@@ -255,7 +255,7 @@ class LogRevisionsListener implements EventSubscriber
         $this->platform = $this->conn->getDatabasePlatform();
         $this->revisionId = null; // reset revision
 
-        $processedEntities = array();
+        $processedEntities = [];
 
         foreach ($this->uow->getScheduledEntityDeletions() AS $entity) {
             //doctrine is fine deleting elements multiple times. We are not.
@@ -317,14 +317,14 @@ class LogRevisionsListener implements EventSubscriber
         if ($this->revisionId === null) {
             $this->conn->insert(
                 $this->config->getRevisionTableName(),
-                array(
+                [
                     'timestamp' => date_create('now'),
                     'username' => $this->config->getCurrentUsername(),
-                ),
-                array(
+                ],
+                [
                     Type::DATETIME,
                     Type::STRING,
-                )
+                ]
             );
 
             $sequenceName = $this->platform->supportsSequences()
@@ -346,13 +346,13 @@ class LogRevisionsListener implements EventSubscriber
     private function getInsertRevisionSQL($class)
     {
         if (! isset($this->insertRevisionSQL[$class->name])) {
-            $placeholders = array('?', '?');
+            $placeholders = ['?', '?'];
             $tableName = $this->config->getTableName($class);
 
-            $sql = "INSERT INTO " . $tableName . " (" .
-                $this->config->getRevisionFieldName() . ", " . $this->config->getRevisionTypeFieldName();
+            $sql = 'INSERT INTO ' . $tableName . ' (' .
+                $this->config->getRevisionFieldName() . ', ' . $this->config->getRevisionTypeFieldName();
 
-            $fields = array();
+            $fields = [];
 
             foreach ($class->associationMappings as $field => $assoc) {
                 if ($class->isInheritanceTypeJoined() && $class->isInheritedAssociation($field)) {
@@ -394,7 +394,7 @@ class LogRevisionsListener implements EventSubscriber
                 $placeholders[] = '?';
             }
 
-            $sql .= ") VALUES (" . implode(", ", $placeholders) . ")";
+            $sql .= ') VALUES (' . implode(', ', $placeholders) . ')';
             $this->insertRevisionSQL[$class->name] = $sql;
         }
 
@@ -408,10 +408,10 @@ class LogRevisionsListener implements EventSubscriber
      */
     private function saveRevisionEntityData($class, $entityData, $revType)
     {
-        $params = array($this->getRevisionId(), $revType);
-        $types = array(\PDO::PARAM_INT, \PDO::PARAM_STR);
+        $params = [$this->getRevisionId(), $revType];
+        $types = [\PDO::PARAM_INT, \PDO::PARAM_STR];
 
-        $fields = array();
+        $fields = [];
 
         foreach ($class->associationMappings AS $field => $assoc) {
             if ($class->isInheritanceTypeJoined() && $class->isInheritedAssociation($field)) {
@@ -490,7 +490,7 @@ class LogRevisionsListener implements EventSubscriber
         return implode(
             ' ',
             array_merge(
-                array(get_class($entity)),
+                [get_class($entity)],
                 $this->uow->getEntityIdentifier($entity)
             )
         );
@@ -521,7 +521,7 @@ class LogRevisionsListener implements EventSubscriber
         $classMetadata = $persister->getClassMetadata();
 
         $versionField = null;
-        $result = array();
+        $result = [];
 
         if (($versioned = $classMetadata->isVersioned) != false) {
             $versionField = $classMetadata->versionField;

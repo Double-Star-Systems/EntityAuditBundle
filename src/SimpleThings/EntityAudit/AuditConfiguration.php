@@ -27,8 +27,8 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 class AuditConfiguration
 {
-    private $auditedEntityClasses = array();
-    private $globalIgnoreColumns = array();
+    private $auditedEntityClasses = [];
+    private $globalIgnoreColumns = [];
     private $tablePrefix = '';
     private $tableSuffix = '_audit';
     private $revisionTableName = 'revisions';
@@ -155,7 +155,7 @@ class AuditConfiguration
     {
         $callable = $this->usernameCallable;
 
-        return (string) ($callable ? $callable() : "");
+        return (string) ($callable ? $callable() : '');
     }
 
     public function setUsernameCallable($usernameCallable)

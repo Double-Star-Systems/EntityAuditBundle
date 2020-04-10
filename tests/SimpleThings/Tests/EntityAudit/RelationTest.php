@@ -45,7 +45,7 @@ use SimpleThings\EntityAudit\Tests\Fixtures\Relation\WineProduct;
 
 class RelationTest extends BaseTest
 {
-    protected $schemaEntities = array(
+    protected $schemaEntities = [
         'SimpleThings\EntityAudit\Tests\Fixtures\Relation\OwnerEntity',
         'SimpleThings\EntityAudit\Tests\Fixtures\Relation\OwnedEntity1',
         'SimpleThings\EntityAudit\Tests\Fixtures\Relation\OwnedEntity2',
@@ -68,9 +68,9 @@ class RelationTest extends BaseTest
         'SimpleThings\EntityAudit\Tests\Fixtures\Relation\DataLegalEntity',
         'SimpleThings\EntityAudit\Tests\Fixtures\Relation\DataPrivateEntity',
         'SimpleThings\EntityAudit\Tests\Fixtures\Relation\DataContainerEntity',
-    );
+    ];
 
-    protected $auditedEntities = array(
+    protected $auditedEntities = [
         'SimpleThings\EntityAudit\Tests\Fixtures\Relation\OwnerEntity',
         'SimpleThings\EntityAudit\Tests\Fixtures\Relation\OwnedEntity1',
         'SimpleThings\EntityAudit\Tests\Fixtures\Relation\OneToOneAuditedEntity',
@@ -90,7 +90,7 @@ class RelationTest extends BaseTest
         'SimpleThings\EntityAudit\Tests\Fixtures\Relation\DataLegalEntity',
         'SimpleThings\EntityAudit\Tests\Fixtures\Relation\DataPrivateEntity',
         'SimpleThings\EntityAudit\Tests\Fixtures\Relation\DataContainerEntity',
-    );
+    ];
 
     public function testUndefinedIndexesInUOWForRelations()
     {
@@ -112,11 +112,11 @@ class RelationTest extends BaseTest
         unset($owner); unset($owned1); unset($owned2);
         $this->em->clear();
 
-        $owner = $this->em->getReference("SimpleThings\\EntityAudit\\Tests\\Fixtures\\Relation\\OwnerEntity", 1);
+        $owner = $this->em->getReference('SimpleThings\\EntityAudit\\Tests\\Fixtures\\Relation\\OwnerEntity', 1);
         $this->em->remove($owner);
-        $owned1 = $this->em->getReference("SimpleThings\\EntityAudit\\Tests\\Fixtures\\Relation\\OwnedEntity1", 1);
+        $owned1 = $this->em->getReference('SimpleThings\\EntityAudit\\Tests\\Fixtures\\Relation\\OwnedEntity1', 1);
         $this->em->remove($owned1);
-        $owned2 = $this->em->getReference("SimpleThings\\EntityAudit\\Tests\\Fixtures\\Relation\\OwnedEntity2", 1);
+        $owned2 = $this->em->getReference('SimpleThings\\EntityAudit\\Tests\\Fixtures\\Relation\\OwnedEntity2', 1);
         $this->em->remove($owned2);
 
         $this->em->flush();
@@ -134,8 +134,8 @@ class RelationTest extends BaseTest
         $this->assertEquals('SimpleThings\EntityAudit\Tests\Fixtures\Relation\OwnedEntity1', get_class($changedOwned));
         $this->assertEquals('DEL', $changedEntities[0]->getRevisionType());
         $this->assertEquals('DEL', $changedEntities[1]->getRevisionType());
-        $this->assertEquals(array('id' => 1), $changedEntities[0]->getId());
-        $this->assertEquals(array('id' => 1), $changedEntities[1]->getId());
+        $this->assertEquals(['id' => 1], $changedEntities[0]->getId());
+        $this->assertEquals(['id' => 1], $changedEntities[1]->getId());
         //uninit proxy messes up ids, it is fine
         $this->assertCount(0, $changedOwner->getOwned1());
         $this->assertCount(0, $changedOwner->getOwned2());
@@ -760,7 +760,7 @@ class RelationTest extends BaseTest
 
         $this->assertCount(3, $auditedOwner->getOwned1());
 
-        $ids = array();
+        $ids = [];
         foreach ($auditedOwner->getOwned1() as $ownedElement) {
             $ids[] = $ownedElement->getId();
         }

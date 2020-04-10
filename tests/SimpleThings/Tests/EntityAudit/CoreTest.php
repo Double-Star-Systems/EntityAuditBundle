@@ -32,7 +32,7 @@ use SimpleThings\EntityAudit\Tests\Fixtures\Core\UserAudit;
 
 class CoreTest extends BaseTest
 {
-    protected $schemaEntities = array(
+    protected $schemaEntities = [
         'SimpleThings\EntityAudit\Tests\Fixtures\Core\ArticleAudit',
         'SimpleThings\EntityAudit\Tests\Fixtures\Core\UserAudit',
         'SimpleThings\EntityAudit\Tests\Fixtures\Core\ProfileAudit',
@@ -42,9 +42,9 @@ class CoreTest extends BaseTest
         'SimpleThings\EntityAudit\Tests\Fixtures\Core\PetAudit',
         'SimpleThings\EntityAudit\Tests\Fixtures\Core\Cat',
         'SimpleThings\EntityAudit\Tests\Fixtures\Core\Dog'
-    );
+    ];
 
-    protected $auditedEntities = array(
+    protected $auditedEntities = [
         'SimpleThings\EntityAudit\Tests\Fixtures\Core\ArticleAudit',
         'SimpleThings\EntityAudit\Tests\Fixtures\Core\UserAudit',
         'SimpleThings\EntityAudit\Tests\Fixtures\Core\ProfileAudit',
@@ -53,12 +53,12 @@ class CoreTest extends BaseTest
         'SimpleThings\EntityAudit\Tests\Fixtures\Core\Fox',
         'SimpleThings\EntityAudit\Tests\Fixtures\Core\Cat',
         'SimpleThings\EntityAudit\Tests\Fixtures\Core\Dog'
-    );
+    ];
 
     public function testAuditable()
     {
-        $user = new UserAudit("beberlei");
-        $article = new ArticleAudit("test", "yadda!", $user, 'text');
+        $user = new UserAudit('beberlei');
+        $article = new ArticleAudit('test', 'yadda!', $user, 'text');
         $rabbit = new Rabbit('rabbit', 'white');
         $foxy = new Fox('foxy', 60);
         $doggy = new Dog('woof', 80);
@@ -77,7 +77,7 @@ class CoreTest extends BaseTest
         $this->assertEquals(1, count($this->em->getConnection()->fetchAll('SELECT * FROM ArticleAudit_audit')));
         $this->assertEquals(2, count($this->em->getConnection()->fetchAll('SELECT * FROM AnimalAudit_audit')));
 
-        $article->setText("oeruoa");
+        $article->setText('oeruoa');
         $rabbit->setName('Rabbit');
         $rabbit->setColor('gray');
         $foxy->setName('Foxy');
@@ -103,7 +103,7 @@ class CoreTest extends BaseTest
 
     public function testFind()
     {
-        $user = new UserAudit("beberlei");
+        $user = new UserAudit('beberlei');
         $foxy = new Fox('foxy', 55);
         $cat = new Cat('pusheen', '#b5a89f');
 
@@ -115,29 +115,29 @@ class CoreTest extends BaseTest
         $reader = $this->auditManager->createAuditReader($this->em);
         $auditUser = $reader->find(get_class($user), $user->getId(), 1);
 
-        $this->assertInstanceOf(get_class($user), $auditUser, "Audited User is also a User instance.");
-        $this->assertEquals($user->getId(), $auditUser->getId(), "Ids of audited user and real user should be the same.");
-        $this->assertEquals($user->getName(), $auditUser->getName(), "Name of audited user and real user should be the same.");
-        $this->assertFalse($this->em->contains($auditUser), "Audited User should not be in the identity map.");
-        $this->assertNotSame($user, $auditUser, "User and Audited User instances are not the same.");
+        $this->assertInstanceOf(get_class($user), $auditUser, 'Audited User is also a User instance.');
+        $this->assertEquals($user->getId(), $auditUser->getId(), 'Ids of audited user and real user should be the same.');
+        $this->assertEquals($user->getName(), $auditUser->getName(), 'Name of audited user and real user should be the same.');
+        $this->assertFalse($this->em->contains($auditUser), 'Audited User should not be in the identity map.');
+        $this->assertNotSame($user, $auditUser, 'User and Audited User instances are not the same.');
 
         $auditFox = $reader->find(get_class($foxy), $foxy->getId(), 1);
 
         $this->assertInstanceOf(get_class($foxy), $auditFox, "Audited SINGLE_TABLE class keeps it's class.");
-        $this->assertEquals($foxy->getId(), $auditFox->getId(), "Ids of audited SINGLE_TABLE class and real SINGLE_TABLE class should be the same.");
-        $this->assertEquals($foxy->getName(), $auditFox->getName(), "Loaded and original attributes should be the same for SINGLE_TABLE inheritance.");
-        $this->assertEquals($foxy->getTailLength(), $auditFox->getTailLength(), "Loaded and original attributes should be the same for SINGLE_TABLE inheritance.");
-        $this->assertFalse($this->em->contains($auditFox), "Audited SINGLE_TABLE inheritance class should not be in the identity map.");
-        $this->assertNotSame($this, $auditFox, "Audited and new entities should not be the same object for SINGLE_TABLE inheritance.");
+        $this->assertEquals($foxy->getId(), $auditFox->getId(), 'Ids of audited SINGLE_TABLE class and real SINGLE_TABLE class should be the same.');
+        $this->assertEquals($foxy->getName(), $auditFox->getName(), 'Loaded and original attributes should be the same for SINGLE_TABLE inheritance.');
+        $this->assertEquals($foxy->getTailLength(), $auditFox->getTailLength(), 'Loaded and original attributes should be the same for SINGLE_TABLE inheritance.');
+        $this->assertFalse($this->em->contains($auditFox), 'Audited SINGLE_TABLE inheritance class should not be in the identity map.');
+        $this->assertNotSame($this, $auditFox, 'Audited and new entities should not be the same object for SINGLE_TABLE inheritance.');
 
         $auditCat = $reader->find(get_class($cat), $cat->getId(), 1);
 
         $this->assertInstanceOf(get_class($cat), $auditCat, "Audited JOINED class keeps it's class.");
-        $this->assertEquals($cat->getId(), $auditCat->getId(), "Ids of audited JOINED class and real JOINED class should be the same.");
-        $this->assertEquals($cat->getName(), $auditCat->getName(), "Loaded and original attributes should be the same for JOINED inheritance.");
-        $this->assertEquals($cat->getColor(), $auditCat->getColor(), "Loaded and original attributes should be the same for JOINED inheritance.");
-        $this->assertFalse($this->em->contains($auditCat), "Audited JOINED inheritance class should not be in the identity map.");
-        $this->assertNotSame($this, $auditCat, "Audited and new entities should not be the same object for JOINED inheritance.");
+        $this->assertEquals($cat->getId(), $auditCat->getId(), 'Ids of audited JOINED class and real JOINED class should be the same.');
+        $this->assertEquals($cat->getName(), $auditCat->getName(), 'Loaded and original attributes should be the same for JOINED inheritance.');
+        $this->assertEquals($cat->getColor(), $auditCat->getColor(), 'Loaded and original attributes should be the same for JOINED inheritance.');
+        $this->assertFalse($this->em->contains($auditCat), 'Audited JOINED inheritance class should not be in the identity map.');
+        $this->assertNotSame($this, $auditCat, 'Audited and new entities should not be the same object for JOINED inheritance.');
     }
 
     public function testFindNoRevisionFound()
@@ -159,17 +159,17 @@ class CoreTest extends BaseTest
             'SimpleThings\EntityAudit\Exception\NotAuditedException',
             "Class 'stdClass' is not audited."
         );
-        $auditUser = $reader->find("stdClass", 1, 1);
+        $auditUser = $reader->find('stdClass', 1, 1);
     }
 
     public function testFindRevisionHistory()
     {
-        $user = new UserAudit("beberlei");
+        $user = new UserAudit('beberlei');
 
         $this->em->persist($user);
         $this->em->flush();
 
-        $article = new ArticleAudit("test", "yadda!", $user, 'text');
+        $article = new ArticleAudit('test', 'yadda!', $user, 'text');
 
         $this->em->persist($article);
         $this->em->flush();
@@ -191,8 +191,8 @@ class CoreTest extends BaseTest
 
     public function testFindEntitesChangedAtRevision()
     {
-        $user = new UserAudit("beberlei");
-        $article = new ArticleAudit("test", "yadda!", $user, 'text');
+        $user = new UserAudit('beberlei');
+        $article = new ArticleAudit('test', 'yadda!', $user, 'text');
         $foxy = new Fox('foxy', 50);
         $rabbit = new Rabbit('rabbit', 'white');
         $cat = new Cat('pusheen', '#b5a89f');
@@ -215,12 +215,12 @@ class CoreTest extends BaseTest
 
         $this->assertEquals('SimpleThings\EntityAudit\Tests\Fixtures\Core\ArticleAudit', $changedEntities[0]->getClassName());
         $this->assertEquals('INS', $changedEntities[0]->getRevisionType());
-        $this->assertEquals(array('id' => 1), $changedEntities[0]->getId());
+        $this->assertEquals(['id' => 1], $changedEntities[0]->getId());
         $this->assertInstanceOf('SimpleThings\EntityAudit\Tests\Fixtures\Core\ArticleAudit', $changedEntities[0]->getEntity());
 
         $this->assertEquals('SimpleThings\EntityAudit\Tests\Fixtures\Core\UserAudit', $changedEntities[1]->getClassName());
         $this->assertEquals('INS', $changedEntities[1]->getRevisionType());
-        $this->assertEquals(array('id' => 1), $changedEntities[1]->getId());
+        $this->assertEquals(['id' => 1], $changedEntities[1]->getId());
         $this->assertInstanceOf('SimpleThings\EntityAudit\Tests\Fixtures\Core\UserAudit', $changedEntities[1]->getEntity());
     }
 
@@ -229,15 +229,15 @@ class CoreTest extends BaseTest
         // Insert user without the manager to skip revision registering.
         $this->em->getConnection()->insert(
             $this->em->getClassMetadata('SimpleThings\EntityAudit\Tests\Fixtures\Core\UserAudit')->getTableName(),
-            array(
+            [
                 'id' => 1,
                 'name' => 'beberlei',
-            )
+            ]
         );
 
         $article = new ArticleAudit(
-            "test",
-            "yadda!",
+            'test',
+            'yadda!',
             $this->em->getRepository('SimpleThings\EntityAudit\Tests\Fixtures\Core\UserAudit')->find(1),
             'text'
         );
@@ -260,11 +260,11 @@ class CoreTest extends BaseTest
         // Insert user without the manager to skip revision registering.
         $this->em->getConnection()->insert(
             $this->em->getClassMetadata('SimpleThings\EntityAudit\Tests\Fixtures\Core\ProfileAudit')->getTableName(),
-            array(
+            [
                 'id' => 1,
                 'biography' => 'He is an amazing contributor!',
                 'user_id' => 1,
-            )
+            ]
         );
 
         $reader = $this->auditManager->createAuditReader($this->em);
@@ -274,7 +274,7 @@ class CoreTest extends BaseTest
 
     public function testFindRevisions()
     {
-        $user = new UserAudit("beberlei");
+        $user = new UserAudit('beberlei');
         $foxy = new Fox('foxy', 30);
         $rabbit = new Rabbit('rabbit', 'white');
         $cat = new Cat('pusheen', '#b5a89f');
@@ -289,7 +289,7 @@ class CoreTest extends BaseTest
 
         $foxy->setName('Foxy');
         $dog->setName('doge');
-        $user->setName("beberlei2");
+        $user->setName('beberlei2');
         $this->em->flush();
 
         $reader = $this->auditManager->createAuditReader($this->em);
@@ -321,7 +321,7 @@ class CoreTest extends BaseTest
         $this->em->persist($user);
         $this->em->flush();
 
-        $user->setName("Rajesh");
+        $user->setName('Rajesh');
         $this->em->flush();
 
         $reader = $this->auditManager->createAuditReader($this->em);
@@ -329,7 +329,7 @@ class CoreTest extends BaseTest
         $revision = $reader->getCurrentRevision(get_class($user), $user->getId());
         $this->assertEquals(2, $revision);
 
-        $user->setName("David");
+        $user->setName('David');
         $this->em->flush();
 
         $revision = $reader->getCurrentRevision(get_class($user), $user->getId());
@@ -338,14 +338,14 @@ class CoreTest extends BaseTest
 
     public function testGlobalIgnoreColumns()
     {
-        $user = new UserAudit("welante");
-        $article = new ArticleAudit("testcolumn", "yadda!", $user, 'text');
+        $user = new UserAudit('welante');
+        $article = new ArticleAudit('testcolumn', 'yadda!', $user, 'text');
 
         $this->em->persist($user);
         $this->em->persist($article);
         $this->em->flush();
 
-        $article->setText("testcolumn2");
+        $article->setText('testcolumn2');
         $this->em->persist($article);
         $this->em->flush();
 
@@ -354,7 +354,7 @@ class CoreTest extends BaseTest
         $revision = $reader->getCurrentRevision(get_class($article), $article->getId());
         $this->assertEquals(2, $revision);
 
-        $article->setIgnoreme("textnew");
+        $article->setIgnoreme('textnew');
         $this->em->persist($article);
         $this->em->flush();
 
@@ -364,7 +364,7 @@ class CoreTest extends BaseTest
 
     public function testDeleteUnInitProxy()
     {
-        $user = new UserAudit("beberlei");
+        $user = new UserAudit('beberlei');
 
         $this->em->persist($user);
         $this->em->flush();
@@ -372,7 +372,7 @@ class CoreTest extends BaseTest
         unset($user);
         $this->em->clear();
 
-        $user = $this->em->getReference("SimpleThings\\EntityAudit\\Tests\\Fixtures\\Core\\UserAudit", 1);
+        $user = $this->em->getReference('SimpleThings\\EntityAudit\\Tests\\Fixtures\\Core\\UserAudit', 1);
         $this->em->remove($user);
         $this->em->flush();
 
@@ -383,7 +383,7 @@ class CoreTest extends BaseTest
         $this->assertContainsOnly('SimpleThings\EntityAudit\ChangedEntity', $changedEntities);
         $this->assertEquals('SimpleThings\EntityAudit\Tests\Fixtures\Core\UserAudit', $changedEntities[0]->getClassName());
         $this->assertEquals('DEL', $changedEntities[0]->getRevisionType());
-        $this->assertEquals(array('id' => 1), $changedEntities[0]->getId());
+        $this->assertEquals(['id' => 1], $changedEntities[0]->getId());
     }
 
     public function testUsernameResolvingIsDynamic()

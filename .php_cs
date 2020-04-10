@@ -1,44 +1,28 @@
 <?php
 
-$header = <<<EOF
-
-(c) 2011 SimpleThings GmbH
-
-@package SimpleThings\EntityAudit
-@author Benjamin Eberlei <eberlei@simplethings.de>
-@link http://www.simplethings.de
-
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Lesser General Public
-License as published by the Free Software Foundation; either
-version 2.1 of the License, or (at your option) any later version.
-
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-Lesser General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public
-License along with this library; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-
-EOF;
-
-Symfony\CS\Fixer\Contrib\HeaderCommentFixer::setHeader($header);
-
-$finder = Symfony\CS\Finder\DefaultFinder::create()
-    ->in(array(__DIR__))
-;
-
-return Symfony\CS\Config\Config::create()
-    ->level(Symfony\CS\FixerInterface::PSR2_LEVEL)
-    ->fixers(array(
-        'header_comment',
-        'newline_after_open_tag',
-        'ordered_use',
-        'long_array_syntax',
-        'php_unit_construct',
-    ))
-    ->setUsingCache(true)
-    ->finder($finder)
+return PhpCsFixer\Config::create()
+    ->setRules([
+        'array_syntax' => ['syntax' => 'short'],
+        'concat_space' => ['spacing' => 'one'],
+        'linebreak_after_opening_tag' => true,
+        'single_quote' => true,
+        'ordered_imports' => false,
+        'phpdoc_align' => false,
+        'phpdoc_annotation_without_dot' => false,
+        'single_trait_insert_per_statement' => false,
+        'phpdoc_add_missing_param_annotation' => ['only_untyped' => false],
+        'phpdoc_no_empty_return' => true,
+        'phpdoc_types' => true,
+        'no_empty_phpdoc' => true,
+        'class_definition' => [
+            'multi_line_extends_each_single_line' => true,
+        ],
+    ])
+    ->setFinder(
+        PhpCsFixer\Finder::create()
+            ->in([
+                __DIR__.'/tests',
+                __DIR__.'/src',
+            ])
+    )
 ;

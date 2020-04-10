@@ -21,6 +21,7 @@ class AuditManager
 
     /**
      * @param AuditConfiguration $config
+     * @param EntityCache $entityCache
      */
     public function __construct(AuditConfiguration $config, EntityCache $entityCache)
     {

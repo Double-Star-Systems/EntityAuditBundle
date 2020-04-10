@@ -76,14 +76,14 @@ class AuditedCollection implements Collection
      *
      * @var array
      */
-    protected $entities = array();
+    protected $entities = [];
 
     /**
      * Definition of current association
      *
      * @var array
      */
-    protected $associationDefinition = array();
+    protected $associationDefinition = [];
 
     /**
      * @var bool
@@ -114,7 +114,7 @@ class AuditedCollection implements Collection
      */
     public function clear()
     {
-        $this->entities = array();
+        $this->entities = [];
         $this->initialized = false;
     }
 
@@ -319,7 +319,7 @@ class AuditedCollection implements Collection
     {
         $this->forceLoad();
 
-        $true = $false = array();
+        $true = $false = [];
 
         foreach ($this->entities as $entity) {
             if ($p($entity)) {
@@ -329,7 +329,7 @@ class AuditedCollection implements Collection
             }
         }
 
-        return array($true, $false);
+        return [$true, $false];
     }
 
     /**
@@ -442,45 +442,45 @@ class AuditedCollection implements Collection
     protected function initialize()
     {
         if (!$this->initialized) {
-            $params = array();
+            $params = [];
 
-            $sql = 'SELECT MAX('.$this->configuration->getRevisionFieldName().') as rev, ';
-            $sql .= implode(', ', $this->metadata->getIdentifierColumnNames()).' ';
+            $sql = 'SELECT MAX(' . $this->configuration->getRevisionFieldName() . ') as rev, ';
+            $sql .= implode(', ', $this->metadata->getIdentifierColumnNames()) . ' ';
             if (isset($this->associationDefinition['indexBy'])) {
-                $sql .= ', '.$this->associationDefinition['indexBy'].' ';
+                $sql .= ', ' . $this->associationDefinition['indexBy'] . ' ';
             }
             $sql .= 'FROM ' . $this->configuration->getTableName($this->metadata) . ' t ';
             $sql .= 'WHERE ' . $this->configuration->getRevisionFieldName() . ' <= ' . $this->revision . ' ';
 
             foreach ($this->foreignKeys as $column => $value) {
-                $sql .= 'AND '.$column.' = ? ';
+                $sql .= 'AND ' . $column . ' = ? ';
                 $params[] = $value;
             }
 
             //we check for revisions greater than current belonging to other entities
-            $sql .= 'AND NOT EXISTS (SELECT * FROM '. $this->configuration->getTableName($this->metadata) . ' st WHERE';
+            $sql .= 'AND NOT EXISTS (SELECT * FROM ' . $this->configuration->getTableName($this->metadata) . ' st WHERE';
 
             //ids
             foreach ($this->metadata->getIdentifierColumnNames() as $name) {
-                $sql .= ' st.'.$name.' = t.'.$name.' AND';
+                $sql .= ' st.' . $name . ' = t.' . $name . ' AND';
             }
 
             //foreigns
             $sql .= ' ((';
 
             //master entity query, not equals
-            $notEqualParts = $nullParts = array();
+            $notEqualParts = $nullParts = [];
             foreach($this->foreignKeys as $column => $value) {
-                $notEqualParts[] = $column.' <> ?';
-                $nullParts[] = $column.' IS NULL';
+                $notEqualParts[] = $column . ' <> ?';
+                $nullParts[] = $column . ' IS NULL';
                 $params[] = $value;
             }
 
-            $sql .= implode(' AND ', $notEqualParts).') OR ('.implode(' AND ', $nullParts).'))';
+            $sql .= implode(' AND ', $notEqualParts) . ') OR (' . implode(' AND ', $nullParts) . '))';
 
             //revision
-            $sql .= ' AND st.'.$this->configuration->getRevisionFieldName().' <= '.$this->revision;
-            $sql .= ' AND st.'.$this->configuration->getRevisionFieldName().' > t.'.$this->configuration->getRevisionFieldName();
+            $sql .= ' AND st.' . $this->configuration->getRevisionFieldName() . ' <= ' . $this->revision;
+            $sql .= ' AND st.' . $this->configuration->getRevisionFieldName() . ' > t.' . $this->configuration->getRevisionFieldName();
 
             $sql .= ') ';
             //end of check for for belonging to other entities
@@ -490,35 +490,35 @@ class AuditedCollection implements Collection
 
             //ids
             foreach ($this->metadata->getIdentifierColumnNames() as $name) {
-                $sql .= ' sd.'.$name.' = t.'.$name.' AND';
+                $sql .= ' sd.' . $name . ' = t.' . $name . ' AND';
             }
 
             //revision
-            $sql .= ' sd.'.$this->configuration->getRevisionFieldName().' <= '.$this->revision;
-            $sql .= ' AND sd.'.$this->configuration->getRevisionFieldName().' > t.'.$this->configuration->getRevisionFieldName();
+            $sql .= ' sd.' . $this->configuration->getRevisionFieldName() . ' <= ' . $this->revision;
+            $sql .= ' AND sd.' . $this->configuration->getRevisionFieldName() . ' > t.' . $this->configuration->getRevisionFieldName();
 
-            $sql .= ' AND sd.'.$this->configuration->getRevisionTypeFieldName().' = ?';
+            $sql .= ' AND sd.' . $this->configuration->getRevisionTypeFieldName() . ' = ?';
             $params[] = 'DEL';
 
             $sql .= ') ';
             //end check for deleted revisions older than requested
 
-            $sql .= 'AND '.$this->configuration->getRevisionTypeFieldName().' <> ? ';
+            $sql .= 'AND ' . $this->configuration->getRevisionTypeFieldName() . ' <> ? ';
             $params[] = 'DEL';
 
             $groupBy = $this->metadata->getIdentifierColumnNames();
             if (isset($this->associationDefinition['indexBy'])) {
                 $groupBy[] = $this->associationDefinition['indexBy'];
             }
-            $sql .= ' GROUP BY '.implode(', ', $groupBy);
-            $sql .= ' ORDER BY '.implode(' ASC, ', $this->metadata->getIdentifierColumnNames()).' ASC';
+            $sql .= ' GROUP BY ' . implode(', ', $groupBy);
+            $sql .= ' ORDER BY ' . implode(' ASC, ', $this->metadata->getIdentifierColumnNames()) . ' ASC';
 
             $rows = $this->auditReader->getConnection()->fetchAll($sql, $params);
 
             foreach ($rows as $row) {
-                $entity = array(
+                $entity = [
                     'rev' => $row['rev']
-                );
+                ];
 
                 unset($row['rev']);
 

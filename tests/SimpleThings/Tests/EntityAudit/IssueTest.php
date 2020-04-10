@@ -48,7 +48,7 @@ use SimpleThings\EntityAudit\Tests\Fixtures\Issue\Issue198Car;
 
 class IssueTest extends BaseTest
 {
-    protected $schemaEntities = array(
+    protected $schemaEntities = [
         'SimpleThings\EntityAudit\Tests\Fixtures\Issue\EscapedColumnsEntity',
         'SimpleThings\EntityAudit\Tests\Fixtures\Issue\Issue87Project',
         'SimpleThings\EntityAudit\Tests\Fixtures\Issue\Issue87ProjectComment',
@@ -71,9 +71,9 @@ class IssueTest extends BaseTest
         'SimpleThings\EntityAudit\Tests\Fixtures\Issue\Issue196Entity',
         'SimpleThings\EntityAudit\Tests\Fixtures\Issue\Issue318User',
         'SimpleThings\EntityAudit\Tests\Fixtures\Issue\ConvertToPHPEntity',
-    );
+    ];
 
-    protected $auditedEntities = array(
+    protected $auditedEntities = [
         'SimpleThings\EntityAudit\Tests\Fixtures\Issue\EscapedColumnsEntity',
         'SimpleThings\EntityAudit\Tests\Fixtures\Issue\Issue87Project',
         'SimpleThings\EntityAudit\Tests\Fixtures\Issue\Issue87ProjectComment',
@@ -96,12 +96,12 @@ class IssueTest extends BaseTest
         'SimpleThings\EntityAudit\Tests\Fixtures\Issue\Issue198Owner',
         'SimpleThings\EntityAudit\Tests\Fixtures\Issue\Issue318User',
         'SimpleThings\EntityAudit\Tests\Fixtures\Issue\ConvertToPHPEntity',
-    );
+    ];
 
-    protected $customTypes = array(
+    protected $customTypes = [
         'issue196type' => 'SimpleThings\EntityAudit\Tests\Types\Issue196Type',
         'upper' => 'SimpleThings\EntityAudit\Tests\Types\ConvertToPHPType',
-    );
+    ];
 
     public function testIssue31()
     {
@@ -196,7 +196,7 @@ class IssueTest extends BaseTest
         $address->setAddressText('NY, Red Street 6');
 
         $customer = new Issue9Customer();
-        $customer->setAddresses(array($address));
+        $customer->setAddresses([$address]);
         $customer->setPrimaryAddress($address);
 
         $address->setCustomer($customer);
@@ -333,7 +333,7 @@ class IssueTest extends BaseTest
         $this->em->persist($user);
         $this->em->flush();
         $userMetadata = $this->em->getClassMetadata(get_class($user));
-        $classes = array($userMetadata);
+        $classes = [$userMetadata];
         $schema = $this->getSchemaTool()->getSchemaFromMetadata($classes);
         $schemaName = $schema->getName();
         $config = $this->getAuditManager()->getConfiguration();

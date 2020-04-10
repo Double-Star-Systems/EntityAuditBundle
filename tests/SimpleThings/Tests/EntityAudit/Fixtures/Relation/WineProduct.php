@@ -7,4 +7,5 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity
  */
-class WineProduct extends Product {}
+class WineProduct extends Product
+{}

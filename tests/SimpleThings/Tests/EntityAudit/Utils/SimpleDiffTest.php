@@ -11,7 +11,6 @@ class SimpleDiffTest extends \PHPUnit_Framework_TestCase
      * @param $old
      * @param $new
      * @param $output
-     * @return void
      */
     public function testDiff($old, $new, $output)
     {
@@ -23,12 +22,12 @@ class SimpleDiffTest extends \PHPUnit_Framework_TestCase
 
     static public function dataDiff()
     {
-        return array(
-            array('Foo', 'foo', '<del>Foo</del> <ins>foo</ins> '),
-            array('Foo Foo', 'Foo', 'Foo <del>Foo</del> '),
-            array('Foo', 'Foo Foo', 'Foo <ins>Foo</ins> '),
-            array('Foo Bar Baz', 'Foo Foo Foo', 'Foo <del>Bar Baz</del> <ins>Foo Foo</ins> '),
-            array('Foo Bar Baz', 'Foo Baz', 'Foo <del>Bar</del> Baz '),
-        );
+        return [
+            ['Foo', 'foo', '<del>Foo</del> <ins>foo</ins> '],
+            ['Foo Foo', 'Foo', 'Foo <del>Foo</del> '],
+            ['Foo', 'Foo Foo', 'Foo <ins>Foo</ins> '],
+            ['Foo Bar Baz', 'Foo Foo Foo', 'Foo <del>Bar Baz</del> <ins>Foo Foo</ins> '],
+            ['Foo Bar Baz', 'Foo Baz', 'Foo <del>Bar</del> Baz '],
+        ];
     }
 }

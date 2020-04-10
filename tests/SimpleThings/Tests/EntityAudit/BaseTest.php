@@ -58,9 +58,9 @@ abstract class BaseTest extends \PHPUnit_Framework_TestCase
      */
     protected $auditManager;
 
-    protected $schemaEntities = array();
+    protected $schemaEntities = [];
 
-    protected $auditedEntities = array();
+    protected $auditedEntities = [];
 
     public function setUp()
     {
@@ -91,11 +91,11 @@ abstract class BaseTest extends \PHPUnit_Framework_TestCase
         $config->setAutoGenerateProxyClasses(ProxyFactory::AUTOGENERATE_EVAL);
         $config->setProxyNamespace('SimpleThings\EntityAudit\Tests\Proxies');
 
-        $config->setMetadataDriverImpl($config->newDefaultAnnotationDriver(array(
+        $config->setMetadataDriverImpl($config->newDefaultAnnotationDriver([
             realpath(__DIR__ . '/Fixtures/Core'),
             realpath(__DIR__ . '/Fixtures/Issue'),
             realpath(__DIR__ . '/Fixtures/Relation'),
-        ), false));
+        ], false));
 
         Gedmo\DoctrineExtensions::registerAnnotations();
 
@@ -105,7 +105,7 @@ abstract class BaseTest extends \PHPUnit_Framework_TestCase
         $evm = $connection->getEventManager();
         foreach ($evm->getListeners() as $event => $listeners) {
             foreach ($listeners as $listener) {
-                $evm->removeEventListener(array($event), $listener);
+                $evm->removeEventListener([$event], $listener);
             }
         }
 
@@ -149,14 +149,14 @@ abstract class BaseTest extends \PHPUnit_Framework_TestCase
                 $GLOBALS['db_name'],
                 $GLOBALS['db_port']
             )){
-                $params = array(
+                $params = [
                     'driver' => $GLOBALS['db_type'],
                     'user' => $GLOBALS['db_username'],
                     'password' => $GLOBALS['db_password'],
                     'host' => $GLOBALS['db_host'],
                     'dbname' => $GLOBALS['db_name'],
                     'port' => $GLOBALS['db_port'],
-                );
+                ];
 
                 $tmpParams = $params;
                 $dbname = $params['dbname'];
@@ -179,10 +179,10 @@ abstract class BaseTest extends \PHPUnit_Framework_TestCase
                 $conn->close();
 
             } else {
-                $params = array(
+                $params = [
                     'driver' => 'pdo_sqlite',
                     'memory' => true,
-                );
+                ];
             }
 
             self::$conn = DriverManager::getConnection($params);
@@ -201,7 +201,7 @@ abstract class BaseTest extends \PHPUnit_Framework_TestCase
         }
 
         $auditConfig = AuditConfiguration::forEntities($this->auditedEntities);
-        $auditConfig->setGlobalIgnoreColumns(array('ignoreme'));
+        $auditConfig->setGlobalIgnoreColumns(['ignoreme']);
         $auditConfig->setUsernameCallable(function () {
             return 'beberlei';
         });

@@ -343,7 +343,7 @@ class IssueTest extends BaseTest
         $revisions = $auditReader->findRevisions($userClass, $user->getId());
         $this->assertCount(1, $revisions);
         $revision = reset($revisions);
-        $auditedUser = $auditReader->find($userClass, array('id' => $user->getId()), $revision->getRev());
+        $auditedUser = $auditReader->find($userClass, ['id' => $user->getId()], $revision->getRev());
 
         $this->assertInstanceOf('Doctrine\Common\Collections\Collection', $auditedUser->getChildren());
     }

@@ -501,6 +501,95 @@ class AuditReader
                         $class->reflFields[$assoc['fieldName']]->setValue($entity, new ArrayCollection());
                     }
                 }
+            } elseif ($assoc['type'] & ClassMetadata::MANY_TO_MANY) {
+                if ($assoc['isOwningSide']) {
+                    $whereId = [$this->config->getRevisionFieldName() . ' = ?'];
+                    $values = [$revision];
+                    foreach ($assoc['relationToSourceKeyColumns'] as $sourceKeyJoinColumn => $sourceKeyColumn) {
+                        $whereId[] = "{$sourceKeyJoinColumn} = ?";
+                        $values[] = $class->reflFields[$sourceKeyColumn]->getValue($entity);
+                    }
+
+                    $whereSQL  = implode(' AND ', $whereId);
+                    $columnList = [$this->config->getRevisionFieldName(), $this->config->getRevisionTypeFieldName()];
+                    $tableName = $this->config->getTablePrefix() . $assoc['joinTable']['name'] . $this->config->getTableSuffix();
+
+                    foreach($assoc['relationToTargetKeyColumns'] as $targetKeyJoinColumn => $targetKeyColumn) {
+                        $columnList[] = $targetKeyJoinColumn;
+                    }
+                    $query = 'SELECT ' . implode(', ', $columnList) . ' FROM ' . $tableName . ' e WHERE ' . $whereSQL . ' ORDER BY e.' . $this->config->getRevisionFieldName() . ' DESC';
+
+                    $rows = $this->em->getConnection()->fetchAll($query, $values);
+
+                    $collection = new ArrayCollection();
+                    if ($rows) {
+                        if ($this->metadataFactory->isAudited($assoc['targetEntity'])) {
+                            foreach ($rows as $row) {
+                                $id = [];
+                                foreach($assoc['relationToTargetKeyColumns'] as $targetKeyJoinColumn => $targetKeyColumn) {
+                                    $id[$targetKeyColumn] = $row[$targetKeyJoinColumn];
+                                }
+                                $collection->add($this->find($targetClass->getName(), $id, $revision));
+                            }
+                        } else {
+                            if ($this->loadNativeCollections) {
+                                $collection = new PersistentCollection($this->em, $targetClass, new ArrayCollection());
+
+                                $this->getEntityPersister($assoc['targetEntity'])
+                                    ->loadManyToManyCollection($assoc, $entity, $collection);
+
+                                $class->reflFields[$assoc['fieldName']]->setValue($entity, $collection);
+                            } else {
+                                $class->reflFields[$assoc['fieldName']]->setValue($entity, new ArrayCollection());
+                            }
+                        }
+                    }
+                    $class->reflFields[$field]->setValue($entity, $collection);
+                } else {
+                    $targetAssoc = $targetClass->associationMappings[$assoc['mappedBy']];
+                    $whereId = [$this->config->getRevisionFieldName() . ' = ?'];
+                    $values = [$revision];
+                    foreach ($targetAssoc['relationToTargetKeyColumns'] as $targetKeyJoinColumn => $targetKeyColumn) {
+                        $whereId[] = "{$targetKeyJoinColumn} = ?";
+                        $values[] = $class->reflFields[$targetKeyColumn]->getValue($entity);
+                    }
+
+                    $whereSQL  = implode(' AND ', $whereId);
+                    $columnList = [$this->config->getRevisionFieldName(), $this->config->getRevisionTypeFieldName()];
+                    $tableName = $this->config->getTablePrefix() . $targetAssoc['joinTable']['name'] . $this->config->getTableSuffix();
+
+                    foreach($targetAssoc['relationToSourceKeyColumns'] as $sourceKeyJoinColumn => $sourceKeyColumn) {
+                        $columnList[] = $sourceKeyJoinColumn;
+                    }
+                    $query = 'SELECT ' . implode(', ', $columnList) . ' FROM ' . $tableName . ' e WHERE ' . $whereSQL . ' ORDER BY e.' . $this->config->getRevisionFieldName() . ' DESC';
+
+                    $rows = $this->em->getConnection()->fetchAll($query, $values);
+
+                    $collection = new ArrayCollection();
+                    if ($rows) {
+                        if ($this->metadataFactory->isAudited($assoc['targetEntity'])) {
+                            foreach ($rows as $row) {
+                                $id = [];
+                                foreach($targetAssoc['relationToSourceKeyColumns'] as $sourceKeyJoinColumn => $sourceKeyColumn) {
+                                    $id[$sourceKeyColumn] = $row[$sourceKeyJoinColumn];
+                                }
+                                $collection->add($this->find($targetClass->getName(), $id, $revision));
+                            }
+                        } else {
+                            if ($this->loadNativeCollections) {
+                                $collection = new PersistentCollection($this->em, $targetClass, new ArrayCollection());
+
+                                $this->getEntityPersister($assoc['targetEntity'])
+                                    ->loadManyToManyCollection($assoc, $entity, $collection);
+
+                                $class->reflFields[$assoc['fieldName']]->setValue($entity, $collection);
+                            } else {
+                                $class->reflFields[$assoc['fieldName']]->setValue($entity, new ArrayCollection());
+                            }
+                        }
+                    }
+                    $class->reflFields[$field]->setValue($entity, $collection);
+                }
             } else {
                 // Inject collection
                 $reflField = $class->reflFields[$field];

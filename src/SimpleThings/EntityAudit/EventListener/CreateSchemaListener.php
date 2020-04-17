@@ -101,6 +101,42 @@ class CreateSchemaListener implements EventSubscriber
         $revisionTable->setPrimaryKey($pkColumns);
         $revIndexName = $this->config->getRevisionFieldName() . '_' . md5($revisionTable->getName()) . '_idx';
         $revisionTable->addIndex([$this->config->getRevisionFieldName()],$revIndexName);
+
+        foreach ($cm->associationMappings as $associationMapping) {
+            if ($associationMapping['isOwningSide'] && isset($associationMapping['joinTable'])) {
+                if (isset($associationMapping['joinTable']['name'])) {
+                    $joinTable = $schema->getTable($associationMapping['joinTable']['name']);
+
+                    //ignore specific fields for table
+                    if ($this->config->isIgnoredField($joinTable)) {
+                        continue;
+                    }
+
+                    $revisionJoinTable = $schema->createTable(
+                        $this->config->getTablePrefix() . $joinTable->getName() . $this->config->getTableSuffix()
+                    );
+                    foreach ($joinTable->getColumns() as $column) {
+                        /* @var Column $column */
+                        $revisionJoinTable->addColumn(
+                            $column->getName(),
+                            $column->getType()->getName(),
+                            array_merge(
+                                $column->toArray(),
+                                ['notnull' => false, 'autoincrement' => false]
+                            )
+                        );
+                    }
+                    $revisionJoinTable->addColumn($this->config->getRevisionFieldName(), $this->config->getRevisionIdFieldType());
+                    $revisionJoinTable->addColumn($this->config->getRevisionTypeFieldName(), 'string', ['length' => 4]);
+
+                    $pkColumns = $joinTable->getPrimaryKey()->getColumns();
+                    $pkColumns[] = $this->config->getRevisionFieldName();
+                    $revisionJoinTable->setPrimaryKey($pkColumns);
+                    $revIndexName = $this->config->getRevisionFieldName() . '_' . md5($revisionJoinTable->getName()) . '_idx';
+                    $revisionJoinTable->addIndex([$this->config->getRevisionFieldName()], $revIndexName);
+                }
+            }
+        }
     }
 
     public function postGenerateSchema(GenerateSchemaEventArgs $eventArgs)

@@ -230,9 +230,15 @@ class LogRevisionsListener implements EventSubscriber
             }
         }
 
-        // if we have no changes left => don't create revision log
+        // If we have no changes left.
         if (count($changeset) == 0) {
-            return;
+            // And there aren't any changes to associations.
+            if (empty(array_filter(array_map(function ($collection) {
+                return $collection->isDirty();
+            }, $this->getManyToManyRelations($entity))))) {
+                // Don't create revision log.
+                return;
+            }
         }
 
         $entityData = array_merge($this->getOriginalEntityData($entity), $this->uow->getEntityIdentifier($entity),

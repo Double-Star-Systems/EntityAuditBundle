@@ -108,7 +108,7 @@ class CreateSchemaListener implements EventSubscriber
                     $joinTable = $schema->getTable($associationMapping['joinTable']['name']);
 
                     //ignore specific fields for table
-                    if ($this->config->isIgnoredField($joinTable)) {
+                    if ($this->config->isIgnoredField($associationMapping['joinTable']['name'])) {
                         continue;
                     }
 

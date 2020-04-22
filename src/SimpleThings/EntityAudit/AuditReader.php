@@ -503,6 +503,10 @@ class AuditReader
                 }
             } elseif ($assoc['type'] & ClassMetadata::MANY_TO_MANY) {
                 if ($assoc['isOwningSide']) {
+                    //ignore specific fields for table
+                    if ($this->config->isIgnoredField($assoc['joinTable']['name'])) {
+                        continue;
+                    }
                     $whereId = [$this->config->getRevisionFieldName() . ' = ?'];
                     $values = [$revision];
                     foreach ($assoc['relationToSourceKeyColumns'] as $sourceKeyJoinColumn => $sourceKeyColumn) {
@@ -547,6 +551,11 @@ class AuditReader
                     $class->reflFields[$field]->setValue($entity, $collection);
                 } else {
                     $targetAssoc = $targetClass->associationMappings[$assoc['mappedBy']];
+                    //ignore specific fields for table
+                    if ($this->config->isIgnoredField($targetAssoc['joinTable']['name'])) {
+                        continue;
+                    }
+
                     $whereId = [$this->config->getRevisionFieldName() . ' = ?'];
                     $values = [$revision];
                     foreach ($targetAssoc['relationToTargetKeyColumns'] as $targetKeyJoinColumn => $targetKeyColumn) {
